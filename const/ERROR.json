@@ -1,0 +1,46 @@
+{
+  "ARGS_NEEDED": {
+    "code": 500,
+    "message": "参数不足"
+  },
+  "PASSWORD_FAIL": {
+    "code": 501,
+    "message": "密码错误"
+  },
+  "COMMON": {
+    "code": 502,
+    "message": "业务出错，请稍后再试"
+  },
+  "REGISTER_PHONE": {
+    "code": 600,
+    "message": "手机号格式错误"
+  },
+  "REGISTER_INVITE": {
+    "code": 601,
+    "message": "空投码有误"
+  },
+  "RESTORE_ARGS": {
+    "code": 610,
+    "message": "请提交私钥或助记词，助记词使用空格分隔"
+  },
+  "RESTORE_PK_ERR": {
+    "code": 611,
+    "message": "私钥或助记词错误，无法恢复钱包"
+  },
+  "LOGIN_FAIL": {
+    "code": 700,
+    "message": "用户名或密码错误"
+  },
+  "RPC_AUTH": {
+    "code": 1000,
+    "message": "RPC auth错误"
+  },
+  "RPC_NO_METHOD": {
+    "code": 1001,
+    "message": "RPC 没有method"
+  },
+  "RPC_TOKEN": {
+    "code": 1002,
+    "message": "RPC token验证失败"
+  }
+}
