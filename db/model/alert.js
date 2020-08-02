@@ -71,7 +71,7 @@ function model(sequelize) {
       unique: true,
     }],
     sequelize,
-    modelName: 'address',
+    modelName: 'alert',
   });
   return Alert;
 }
