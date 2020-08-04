@@ -12,11 +12,11 @@ router.post('/alert/new.json', argsCheck('address', 'type'), (req, res, next) =>
   const { address, type } = req.body;
   Alert.findOrCreate({
     where: {
-      address,
+      address: address.toLowerCase(),
       type,
     },
     defaults: {
-      address,
+      address: address.toLowerCase(),
       type,
     },
   }).then(([alert]) => {
@@ -28,26 +28,31 @@ router.post('/alert/new.json', argsCheck('address', 'type'), (req, res, next) =>
   });
 });
 
-router.post('/alerts/:alertId/callback', (req, res) => {
-  const { alertId } = req.params;
-  Alert.findByPk(alertId).then((alert) => {
-    if (!alert) {
-      res.status(404).end('Not found alert');
-    } else {
-      Callback.create({
-        alertId,
-        raw: JSON.stringify(req.body),
-        parsed: '1',
-      }).then((callback) => {
-        if (callback) {
-          res.status(200);
-          res.end('success');
-        } else {
-          res.status(500);
-          res.end('create fail');
-        }
-      });
-    }
+router.post('/callback', (req, res) => {
+  // const { alertId } = req.params;
+  // Alert.findByPk(alertId).then((alert) => {
+  //   if (!alert) {
+  //     res.status(404).end('Not found alert');
+  //   } else {
+  //     Callback.create({
+  //       alertId,
+  //       raw: JSON.stringify(req.body),
+  //       parsed: '1',
+  //     }).then((callback) => {
+  //       if (callback) {
+  //         res.status(200);
+  //         res.end('success');
+  //       } else {
+  //         res.status(500);
+  //         res.end('create fail');
+  //       }
+  //     });
+  //   }
+  // });
+  Callback.add(req.body).then((callback) => {
+
+    res.status(200);
+    res.end('success');
   });
 });
 

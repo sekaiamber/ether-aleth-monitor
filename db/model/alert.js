@@ -7,7 +7,7 @@ const fetch = require('../../utils/fetch');
 
 const { Model, Op } = Sequelize;
 
-const { ALETH_KEY, ALETH_URL } = process.env;
+const { BN_KEY, BN_URL, BN_NETWORK } = process.env;
 
 class Alert extends Model {
   getData() {
@@ -20,28 +20,20 @@ class Alert extends Model {
   }
 
   setMonitor() {
-    return Promise.resolve(this);
+    // return Promise.resolve(this);
     const { address, webhookId } = this;
     if (webhookId) return Promise.resolve(this);
-    fetch.post(`${ALETH_URL}/v1/webhooks`, {
-      data: {
-        type: 'Webhook',
-        attributes: {
-          source: 'api',
-          target: 'https://example.com/webhook-handler',
-          config: {
-            endpoint: 'https://api.aleth.io/v1/log-entries',
-            filters: {
-              name: 'value',
-            },
-            confirmations: 1,
-          },
-        },
-      },
-    }, {
-      headers: {
-        Authorization: `Bearer ${ALETH_KEY}`,
-      },
+    return fetch.post(BN_URL, {
+      apiKey: BN_KEY,
+      address,
+      blockchain: 'ethereum',
+      networks: [BN_NETWORK],
+    }).then((resp) => {
+      if (resp.msg === 'success') {
+        this.monitored = true;
+        return this.save();
+      }
+      return this;
     });
   }
 }

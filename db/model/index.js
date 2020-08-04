@@ -10,8 +10,8 @@ function model(sequelize) {
   Models.Callback = callback(sequelize);
 
   // 关系
-  Models.Alert.hasMany(Models.Callback, { foreignKey: 'alertId', sourceKey: 'id', as: 'callbacks' });
-  Models.Callback.belongsTo(Models.Alert, { foreignKey: 'alertId', targetKey: 'id', as: 'alert' });
+  Models.Alert.hasMany(Models.Callback, { foreignKey: 'address', sourceKey: 'address', as: 'callbacks' });
+  Models.Callback.belongsTo(Models.Alert, { foreignKey: 'address', targetKey: 'address', as: 'alert' });
 
   return Models;
 }
