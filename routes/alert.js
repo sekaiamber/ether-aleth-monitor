@@ -29,31 +29,18 @@ router.post('/alert/new.json', argsCheck('address', 'type'), (req, res, next) =>
 });
 
 router.post('/callback', (req, res) => {
-  // const { alertId } = req.params;
-  // Alert.findByPk(alertId).then((alert) => {
-  //   if (!alert) {
-  //     res.status(404).end('Not found alert');
-  //   } else {
-  //     Callback.create({
-  //       alertId,
-  //       raw: JSON.stringify(req.body),
-  //       parsed: '1',
-  //     }).then((callback) => {
-  //       if (callback) {
-  //         res.status(200);
-  //         res.end('success');
-  //       } else {
-  //         res.status(500);
-  //         res.end('create fail');
-  //       }
-  //     });
-  //   }
-  // });
   Callback.add(req.body).then((callback) => {
+    if (callback) {
+      callback.fireWebhook();
+    }
 
     res.status(200);
     res.end('success');
   });
+});
+
+router.post('/test_hook.json', (req, res, next) => {
+  next();
 });
 
 module.exports = router;

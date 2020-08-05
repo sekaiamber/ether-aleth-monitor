@@ -8,6 +8,7 @@ const helmet = require('helmet');
 
 const indexRouter = require('./routes/index');
 const alertRouter = require('./routes/alert');
+const addressRouter = require('./routes/address');
 
 const jsonResponse = require('./middlewares/jsonResponse');
 
@@ -35,6 +36,7 @@ app.use(express.static(path.join(__dirname, 'public'), {
 
 app.use('/api/v1/', indexRouter);
 app.use('/api/v1/', alertRouter);
+app.use('/api/v1/', addressRouter);
 
 // json response
 app.use('/api/*.json', jsonResponse);

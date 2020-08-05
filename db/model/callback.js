@@ -3,11 +3,13 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-use-before-define */
 const Sequelize = require('sequelize');
+const fetch = require('../../utils/fetch');
 
 const { Model, Op } = Sequelize;
+const { WEBHOOK } = process.env;
 
 function parseEth(feedback) {
-  const { watchedAddress, system, network, status, hash, from, to, asset, value, direction } = feedback;
+  const { watchedAddress, system, network, status, hash, from, to, asset, value, direction, blockNumber } = feedback;
   const ret = {
     address: watchedAddress.toLowerCase(),
     system,
@@ -16,6 +18,7 @@ function parseEth(feedback) {
     hash: hash.toLowerCase(),
     from: from.toLowerCase(),
     to: to.toLowerCase(),
+    blockNumber,
     asset,
     value,
     decimals: 18,
@@ -25,7 +28,7 @@ function parseEth(feedback) {
 }
 
 function parseErc20(feedback) {
-  const { watchedAddress, system, network, status, hash, from, asset, direction, contractCall } = feedback;
+  const { watchedAddress, system, network, status, hash, from, asset, direction, contractCall, blockNumber } = feedback;
   const { contractType, contractAddress, contractDecimals, methodName, params } = contractCall;
   if (methodName !== 'transfer') return null;
   const { _to, _value } = params;
@@ -38,6 +41,7 @@ function parseErc20(feedback) {
     hash: hash.toLowerCase(),
     from: from.toLowerCase(),
     to: _to.toLowerCase(),
+    blockNumber,
     asset,
     value: _value,
     decimals: contractDecimals,
@@ -51,16 +55,35 @@ function parseErc20(feedback) {
 class Callback extends Model {
   static add(feedback) {
     let obj;
-    const { asset, value, contractCall } = feedback;
-    // 判断是ETH还是ERC20
-    if (asset === 'ETH' && value > 0 && !contractCall) {
-      obj = parseEth(feedback);
-    }
-    if (asset !== 'ETH' && contractCall && contractCall.contractType === 'erc20') {
-      obj = parseErc20(feedback);
-    }
-    if (!obj) return Promise.resolve(null);
-    return Callback.create(obj);
+    const { asset, value, contractCall, watchedAddress } = feedback;
+    const { sequelize } = Callback;
+    const Alert = sequelize.model('alert');
+    return Alert.findOne({
+      where: {
+        address: watchedAddress.toLowerCase(),
+        type: 'tx',
+      },
+    }).then((alert) => {
+      if (!alert) return null;
+      // 判断是ETH还是ERC20
+      if (asset === 'ETH' && value > 0 && !contractCall) {
+        obj = parseEth(feedback);
+      }
+      if (asset !== 'ETH' && contractCall && contractCall.contractType === 'erc20') {
+        obj = parseErc20(feedback);
+      }
+      if (!obj) return null;
+      return Callback.create(obj);
+    });
+  }
+
+  fireWebhook() {
+    fetch.post(WEBHOOK).then((data) => {
+      if (data.success) {
+        this.webhookResponsed = true;
+        this.save();
+      }
+    });
   }
 }
 
@@ -109,6 +132,9 @@ function model(sequelize) {
     },
     direction: {
       type: Sequelize.ENUM('incoming', 'outgoing'),
+    },
+    blockNumber: {
+      type: Sequelize.INTEGER,
     },
     // 合约数据
     contractAddress: {

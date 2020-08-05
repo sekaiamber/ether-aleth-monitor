@@ -6,7 +6,6 @@ const Sequelize = require('sequelize');
 const fetch = require('../../utils/fetch');
 
 const { Model, Op } = Sequelize;
-
 const { BN_KEY, BN_URL, BN_NETWORK } = process.env;
 
 class Alert extends Model {
