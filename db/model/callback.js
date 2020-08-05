@@ -78,12 +78,32 @@ class Callback extends Model {
   }
 
   fireWebhook() {
-    fetch.post(WEBHOOK).then((data) => {
+    fetch.post(WEBHOOK, this.getData()).then((data) => {
       if (data.success) {
         this.webhookResponsed = true;
         this.save();
       }
     });
+  }
+
+  getData() {
+    const ret = {
+      address: this.address,
+      system: this.system,
+      network: this.network,
+      status: this.status,
+      hash: this.hash,
+      from: this.from,
+      to: this.to,
+      asset: this.asset,
+      value: this.value,
+      decimals: this.decimals,
+      direction: this.direction,
+      blockNumber: this.blockNumber,
+      contractAddress: this.contractAddress,
+      contractType: this.contractType,
+    };
+    return ret;
   }
 }
 
