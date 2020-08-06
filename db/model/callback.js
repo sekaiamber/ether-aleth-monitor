@@ -79,7 +79,7 @@ class Callback extends Model {
 
   fireWebhook() {
     fetch.post(WEBHOOK, this.getData()).then((data) => {
-      if (data.success) {
+      if (data.success || data.code === 200) {
         this.webhookResponsed = true;
         this.save();
       }

@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node ./start.js",
     "job": "node ./job.js",
-    "upload_test": "./upload_test.sh"
+    "upload": "./upload.sh"
   },
   "dependencies": {
     "accesscontrol": "^2.2.1",
